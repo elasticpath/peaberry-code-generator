@@ -8,6 +8,11 @@ registry, or both.
 It is not necessary to deploy this jar at runtime. Each of the annotations are marked as RetentionPolicy.SOURCE and will not be present in the
 class files. However, the Peaberry classes that are generated have a runtime dependency on both the Sisu and Peaberry libraries.
 
+## Usage
+
+## Source
+Built with Java 7 and Maven:
+run `mvn clean install` to build
 
 
 
