@@ -20,9 +20,7 @@ import org.apache.velocity.app.VelocityEngine;
 class VelocityCodeGenerationUtility {
 
 	/**
-	 * This prevents install(Peaberry.osgiModule()); from being declared more than once per module.
-	 * todo - Verify this works independently across multiple jars. I am ensure how an annotation processor classloader works. It may be
-	 * necessary to use the currently processing jar's classloader as a discriminator.
+	 * This prevents install(Peaberry.osgiModule()); from being declared more than once per bundle.
 	 */
 	private AtomicBoolean isPeaberryInitializationRequired = new AtomicBoolean(true);
 
