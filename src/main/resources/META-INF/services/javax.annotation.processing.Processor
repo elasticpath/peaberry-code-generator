@@ -1,0 +1,2 @@
+org.eclipse.sisu.contrib.peaberry.ServiceExportAnnotationProcessor
+org.eclipse.sisu.contrib.peaberry.ServiceImportAnnotationProcessor

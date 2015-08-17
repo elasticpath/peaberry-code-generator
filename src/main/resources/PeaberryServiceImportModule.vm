@@ -1,0 +1,22 @@
+package ${packageName};
+
+import static org.ops4j.peaberry.Peaberry.service;
+
+import javax.inject.Named;
+
+import ${serviceInterface};
+import com.google.inject.AbstractModule;
+#if ($peaberryInitRequired == true)
+import org.ops4j.peaberry.Peaberry;
+#end
+@Named
+public class ${serviceInterfaceSimpleName}PeaberryImportModule extends AbstractModule {
+
+	@Override
+	protected void configure() {
+		#if ($peaberryInitRequired == true)
+		install(Peaberry.osgiModule());
+		#end
+		bind(${serviceInterfaceSimpleName}.class).toProvider(service(${serviceInterfaceSimpleName}.class).single());
+	}
+}
