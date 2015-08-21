@@ -19,11 +19,12 @@ import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 
-import org.eclipse.sisu.contrib.peaberry.annotations.ServiceImport;
+import com.sun.tools.javac.code.Type;
 
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
+import org.eclipse.sisu.contrib.peaberry.annotations.ServiceImport;
 
 @SupportedAnnotationTypes("org.eclipse.sisu.contrib.peaberry.annotations.ServiceImport")
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
@@ -38,7 +39,6 @@ public class ServiceImportAnnotationProcessor extends AbstractProcessor {
 	public ServiceImportAnnotationProcessor() {
 		super();
 	}
-
 
 	@Override
 	public boolean process(final Set<? extends TypeElement> annotations, final RoundEnvironment roundEnv) {
@@ -72,7 +72,7 @@ public class ServiceImportAnnotationProcessor extends AbstractProcessor {
 
 		Template moduleTemplate = engine.getTemplate("PeaberryServiceImportModule.vm");
 		JavaFileObject moduleFileObject = processingEnv.getFiler()
-				.createSourceFile(peaberryData.serviceInterfaceSimpleName + "PeaberryImportModule");
+				.createSourceFile( peaberryData.fileNamePrefix + "PeaberryImportModule");
 
 		velocityUtility.writeSourceFile(velocityContext, moduleTemplate, moduleFileObject, processingEnv);
 	}
@@ -80,14 +80,35 @@ public class ServiceImportAnnotationProcessor extends AbstractProcessor {
 	private PeaberryData populatePeaberryData(final Element element) {
 		PeaberryData peaberryData = new PeaberryData();
 		TypeMirror fieldType = element.asType();
-		String serviceInterface = fieldType.toString();
-		String serviceSimpleName = serviceInterface.substring(serviceInterface.lastIndexOf(".") + 1);
-		peaberryData.serviceInterface = serviceInterface;
-		peaberryData.serviceInterfaceSimpleName = serviceSimpleName;
-		processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "annotated type: " + serviceSimpleName);
+		populateServiceData(peaberryData, fieldType);
+		processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "annotated type: " + peaberryData.serviceInterfaceSimpleName);
 		PackageElement typeElement = getEnclosingPackageElement(element);
 		peaberryData.packageName = typeElement.getQualifiedName().toString();
 		return peaberryData;
+	}
+
+	/** If the parameterized type is an Iterable, multiple services are being requested */
+	private void populateServiceData(final PeaberryData peaberryData, final TypeMirror fieldType) {
+		String serviceInterface;
+		if (((Type.ClassType) fieldType).isParameterized()) {
+			String baseType = ((Type.ClassType) fieldType).asElement().toString();
+			if ("java.lang.Iterable".equals(baseType)) {
+				peaberryData.multipleServices = true;
+				serviceInterface = ((Type.ClassType) fieldType).getTypeArguments().toString();
+			} else {
+				serviceInterface = baseType;
+			}
+		} else {
+			serviceInterface = fieldType.toString();
+		}
+		String serviceSimpleName = serviceInterface.substring(serviceInterface.lastIndexOf(".") + 1);
+		String fileNamePrefix = serviceSimpleName;
+		if (peaberryData.multipleServices) {
+			fileNamePrefix = fileNamePrefix + "List";
+		}
+		peaberryData.fileNamePrefix = fileNamePrefix;
+		peaberryData.serviceInterfaceSimpleName = serviceSimpleName;
+		peaberryData.serviceInterface = serviceInterface;
 	}
 
 	private PackageElement getEnclosingPackageElement(final Element element) {

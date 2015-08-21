@@ -15,16 +15,20 @@ public class PeaberryAnnotationProcessorTest {
 
 
 	/**
-	 * Tests need to be grouped together like this because the below line, that installs Peaberry can only be present once per bundle:
+	 * Tests need to be grouped together like this because the Peaberry install declaration can only be present once per bundle:
 	 * install(Peaberry.osgiModule());
 	 */
 	@Test
 	public void runAllTests() {
 		testPeaberryExportClassesGenerateCorrectly();
 
+		testPeaberryExportClassesGenerateCorrectlyWhenNoPid();
+
 		testPeaberryImportClassGeneratesCorrectly();
 
 		testPeaberryImportClassesGeneratesOnceWhenAnnotationsDeclaredMultipleTimes();
+
+		testPeaberryImportClassGeneratesCorrectlyForServiceLists();
 	}
 
 	private void testPeaberryExportClassesGenerateCorrectly() {
@@ -39,6 +43,20 @@ public class PeaberryAnnotationProcessorTest {
 				.generatesSources(
 						JavaFileObjects.forResource("ServiceOnePeaberryExportModule.java"),
 						JavaFileObjects.forResource("ServiceOnePeaberryServiceExport.java")
+				);
+	}
+
+	private void testPeaberryExportClassesGenerateCorrectlyWhenNoPid() {
+		assert_().about(javaSource())
+				.that(JavaFileObjects.forResource("ServiceTwoImpl.java"))
+				.processedWith(
+						new ServiceExportAnnotationProcessor(),
+						new ServiceImportAnnotationProcessor()
+				)
+				.compilesWithoutError()
+				.and()
+				.generatesSources(
+						JavaFileObjects.forResource("ServiceTwoPeaberryExportModule.java")
 				);
 	}
 
@@ -71,4 +89,19 @@ public class PeaberryAnnotationProcessorTest {
 						JavaFileObjects.forResource("ServiceTwoPeaberryImportModule.java")
 				);
 	}
+
+	private void testPeaberryImportClassGeneratesCorrectlyForServiceLists() {
+		assert_().about(javaSource())
+				.that(JavaFileObjects.forResource("ServiceListConsumer.java"))
+				.processedWith(
+						new ServiceExportAnnotationProcessor(),
+						new ServiceImportAnnotationProcessor()
+				)
+				.compilesWithoutError()
+				.and()
+				.generatesSources(
+						JavaFileObjects.forResource("ServiceOneListPeaberryImportModule.java")
+				);
+	}
+
 }

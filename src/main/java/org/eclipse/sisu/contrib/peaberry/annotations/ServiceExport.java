@@ -12,8 +12,8 @@ import java.lang.annotation.Target;
 @Target( value = { ElementType.TYPE } )
 public @interface ServiceExport {
 
-	String name() default "";
+	boolean generatePid() default true;
 
-	/** The interfaces this service should be exported under*/
-	Class<?>[] service() default {};
+	/** The interfaces this service should be exported under */
+	Class<?>[] services() default {};
 }

@@ -1,7 +1,9 @@
 package ${packageName};
 
 import static org.ops4j.peaberry.Peaberry.service;
-
+#if ($multipleServices == true)
+import static org.ops4j.peaberry.util.TypeLiterals.iterable;
+#end
 import javax.inject.Named;
 
 import ${serviceInterface};
@@ -10,13 +12,18 @@ import com.google.inject.AbstractModule;
 import org.ops4j.peaberry.Peaberry;
 #end
 @Named
-public class ${serviceInterfaceSimpleName}PeaberryImportModule extends AbstractModule {
+public class ${fileNamePrefix}PeaberryImportModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
 		#if ($peaberryInitRequired == true)
 		install(Peaberry.osgiModule());
 		#end
+
+		#if ($multipleServices == true)
+		bind(iterable(${serviceInterfaceSimpleName}.class)).toProvider(service(${serviceInterfaceSimpleName}.class).multiple());
+		#else
 		bind(${serviceInterfaceSimpleName}.class).toProvider(service(${serviceInterfaceSimpleName}.class).single());
+		#end
 	}
 }

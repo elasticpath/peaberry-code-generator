@@ -5,6 +5,7 @@ import org.eclipse.sisu.contrib.peaberry.annotations.ServiceExport;
 /**
  * Example Service.
  */
-@ServiceExport( services = ServiceOne.class)
-public class ServiceOneImpl implements ServiceOne {
+@ServiceExport(services = ServiceTwo.class,
+		generatePid = false)
+public class ServiceTwoImpl implements ServiceTwo {
 }

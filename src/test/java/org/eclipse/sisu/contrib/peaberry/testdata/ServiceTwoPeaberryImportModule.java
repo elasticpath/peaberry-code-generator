@@ -12,6 +12,7 @@ public class ServiceTwoPeaberryImportModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
+
 		bind(ServiceTwo.class).toProvider(service(ServiceTwo.class).single());
 	}
 }

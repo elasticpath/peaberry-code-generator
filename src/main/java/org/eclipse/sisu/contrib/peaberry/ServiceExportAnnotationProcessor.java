@@ -2,11 +2,7 @@ package org.eclipse.sisu.contrib.peaberry;
 
 
 import java.io.IOException;
-import java.io.Writer;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -24,18 +20,16 @@ import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 
-import org.eclipse.sisu.contrib.peaberry.annotations.ServiceExport;
-
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
+import org.eclipse.sisu.contrib.peaberry.annotations.ServiceExport;
 
 @SupportedAnnotationTypes("org.eclipse.sisu.contrib.peaberry.annotations.ServiceExport")
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
 public class ServiceExportAnnotationProcessor extends AbstractProcessor {
 
-	private final List<String> processed = new ArrayList<>();
-	private VelocityCodeGenerationUtility velocityUtility = VelocityCodeGenerationUtility.getInstance();
+	private final VelocityCodeGenerationUtility velocityUtility = VelocityCodeGenerationUtility.getInstance();
 
 	/**
 	 * Default Constructor.
@@ -52,9 +46,8 @@ public class ServiceExportAnnotationProcessor extends AbstractProcessor {
 			}
 			try {
 				PeaberryData peaberryData = populatePeaberryData(componentClazz);
-				if (isPeaberryCodeGenerationRequired(peaberryData)) {
+				if (peaberryData.isExportDataInitialialized()) {
 					generatePeaberryCode(peaberryData);
-					processed.add(peaberryData.serviceInterface);
 				}
 			} catch (IOException e) {
 				processingEnv.getMessager()
@@ -62,11 +55,6 @@ public class ServiceExportAnnotationProcessor extends AbstractProcessor {
 			}
 		}
 		return true;
-	}
-
-	private boolean isPeaberryCodeGenerationRequired(PeaberryData peaberryData) {
-		return !processed.contains(peaberryData.serviceInterface)
-				&& peaberryData.isExportDataInitialialized();
 	}
 
 	private void generatePeaberryCode(final PeaberryData peaberryData) throws IOException {
@@ -86,10 +74,11 @@ public class ServiceExportAnnotationProcessor extends AbstractProcessor {
 
 	private PeaberryData populatePeaberryData(final Element componentClazz) {
 		PeaberryData peaberryData = new PeaberryData();
-		ServiceExport component = componentClazz.getAnnotation(ServiceExport.class);
-
+		ServiceExport annotation = componentClazz.getAnnotation(ServiceExport.class);
+		peaberryData.generatePid = annotation.generatePid();
+		//Do not be too alarmed by this code. We trigger this exception to get access the type mirrors. This is currently the cleanest way.
 		try {
-			Class[] serviceClasses = component.service();
+			Class[] serviceClasses = annotation.services();
 			Class throwsException = serviceClasses[0];
 		}
 		catch( MirroredTypesException mte ) {
@@ -98,7 +87,6 @@ public class ServiceExportAnnotationProcessor extends AbstractProcessor {
 			peaberryData.serviceInterface = element.toString();
 			peaberryData.serviceInterfaceSimpleName = element.getSimpleName().toString();
 		}
-
 
 		TypeElement classElement = (TypeElement) componentClazz;
 		PackageElement packageElement = (PackageElement) classElement.getEnclosingElement();
@@ -111,5 +99,4 @@ public class ServiceExportAnnotationProcessor extends AbstractProcessor {
 
 		return peaberryData;
 	}
-	
 }

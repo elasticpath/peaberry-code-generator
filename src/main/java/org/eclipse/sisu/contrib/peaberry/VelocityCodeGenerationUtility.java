@@ -56,6 +56,9 @@ class VelocityCodeGenerationUtility {
 		if (isPeaberryInitializationRequired.compareAndSet(true, false)) {
 			vc.put("peaberryInitRequired", true);
 		}
+		vc.put("generatePid", peaberryData.generatePid);
+		vc.put("multipleServices", peaberryData.multipleServices);
+		vc.put("fileNamePrefix", peaberryData.fileNamePrefix);
 		return vc;
 	}
 
