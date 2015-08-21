@@ -15,5 +15,5 @@ public @interface ServiceExport {
 	boolean generatePid() default true;
 
 	/** The interfaces this service should be exported under */
-	Class<?>[] services() default {};
+	Class<?>[] interfaces() default {};
 }

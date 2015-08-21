@@ -78,7 +78,7 @@ public class ServiceExportAnnotationProcessor extends AbstractProcessor {
 		peaberryData.generatePid = annotation.generatePid();
 		//Do not be too alarmed by this code. We trigger this exception to get access the type mirrors. This is currently the cleanest way.
 		try {
-			Class[] serviceClasses = annotation.services();
+			Class[] serviceClasses = annotation.interfaces();
 			Class throwsException = serviceClasses[0];
 		}
 		catch( MirroredTypesException mte ) {

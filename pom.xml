@@ -37,6 +37,12 @@
 		</developer>
 	</developers>
 
+	<scm>
+		<connection>scm:git:git@github.com:elasticpath/peaberry-code-generator.git</connection>
+		<developerConnection>scm:git:git@github.com:elasticpath/peaberry-code-generator.git</developerConnection>
+		<url>git@github.com:elasticpath/peaberry-code-generator.git</url>
+	</scm>
+
 	<dependencies>
 		<!-- Compile time ONLY dependency, it is used in the generation of the Peaberry classes at compile time, but not after -->
 		<dependency>
