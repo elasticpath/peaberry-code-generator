@@ -3,6 +3,7 @@ package org.eclipse.sisu.contrib.peaberry;
 import static com.google.common.truth.Truth.assert_;
 import static com.google.testing.compile.JavaSourceSubjectFactory.javaSource;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.testing.compile.JavaFileObjects;
@@ -102,6 +103,25 @@ public class PeaberryAnnotationProcessorTest {
 				.generatesSources(
 						JavaFileObjects.forResource("ServiceOneListPeaberryImportModule.java")
 				);
+	}
+
+	@Test
+	@Ignore
+	public void testPeaberryExportClassGeneratesCorrectlyForMultipleServiceInterfaces() {
+		assert_().about(javaSource())
+				.that(JavaFileObjects.forResource("ServiceOneAndTwoImpl.java"))
+				.processedWith(
+						new ServiceExportAnnotationProcessor(),
+						new ServiceImportAnnotationProcessor()
+				)
+				.compilesWithoutError()
+				/* todo - Figure out what the Peaberry code to export a service under multiple interfaces looks like
+				.and()
+
+				.generatesSources(
+						JavaFileObjects.forResource("ServiceOnePeaberryExportModule.java"),
+						JavaFileObjects.forResource("ServiceOnePeaberryServiceExport.java")
+				)*/;
 	}
 
 }
