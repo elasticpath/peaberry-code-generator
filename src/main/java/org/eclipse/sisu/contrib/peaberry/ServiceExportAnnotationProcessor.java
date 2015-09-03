@@ -83,9 +83,12 @@ public class ServiceExportAnnotationProcessor extends AbstractProcessor {
 		}
 		catch( MirroredTypesException mte ) {
 			List<? extends TypeMirror> typeMirrors = mte.getTypeMirrors();
-			Element element = ((DeclaredType)typeMirrors.get(0)).asElement();
-			peaberryData.serviceInterface = element.toString();
-			peaberryData.serviceInterfaceSimpleName = element.getSimpleName().toString();
+			// todo - Figure out what the Peaberry code to export a service under multiple interfaces looks like and update the velocity templates
+			for (TypeMirror typeMirror : typeMirrors) {
+				Element serviceInterface = ((DeclaredType)typeMirror).asElement();
+				peaberryData.serviceInterface = serviceInterface.toString();
+				peaberryData.serviceInterfaceSimpleName = serviceInterface.getSimpleName().toString();
+			}
 		}
 
 		TypeElement classElement = (TypeElement) componentClazz;
